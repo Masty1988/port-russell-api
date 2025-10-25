@@ -1,0 +1,184 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>📚 Documentation API - Port Russell</h1>
+    <p style="color: #666; margin-top: 10px;">
+      API REST privée pour la gestion des catways et réservations du port de plaisance Russell.
+    </p>
+  </div>
+
+  <nav class="nav-menu">
+    <% if (user) { %>
+      <a href="/dashboard" class="nav-btn">🏠 Tableau de bord</a>
+      <a href="/catways" class="nav-btn">🚢 Catways</a>
+      <a href="/reservations" class="nav-btn">📋 Réservations</a>
+      <a href="/users" class="nav-btn">👥 Utilisateurs</a>
+      <a href="/logout" class="nav-btn logout">🚪 Déconnexion</a>
+    <% } else { %>
+      <a href="/" class="nav-btn">🏠 Accueil</a>
+    <% } %>
+  </nav>
+
+  <div class="table-container" style="padding: 40px;">
+    <p style="margin-bottom: 20px;">
+      <strong>Base URL :</strong> <code style="background: #f0f0f0; padding: 4px 8px; border-radius: 4px;">http://localhost:3000/api</code>
+    </p>
+
+    <!-- Section Authentification -->
+    <section style="margin-bottom: 50px;">
+      <h2 style="color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 10px;">🔐 Authentification</h2>
+      
+      <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3 style="color: #333; margin-bottom: 10px;">POST /login</h3>
+        <p>Connexion d'un utilisateur.</p>
+        <pre style="background: #fff; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>{
+  "email": "user@example.com",
+  "password": "motdepasse"
+}</code></pre>
+      </div>
+
+      <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3 style="color: #333; margin-bottom: 10px;">GET /logout</h3>
+        <p>Déconnexion de l'utilisateur.</p>
+      </div>
+    </section>
+
+    <!-- Section Catways -->
+    <section style="margin-bottom: 50px;">
+      <h2 style="color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 10px;">🚢 Catways</h2>
+      
+      <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3 style="color: #333; margin-bottom: 10px;">GET /catways</h3>
+        <p>Récupère tous les catways.</p>
+        <p><strong>Headers :</strong> <code>Authorization: Bearer {token}</code></p>
+      </div>
+
+      <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3 style="color: #333; margin-bottom: 10px;">GET /catways/:id</h3>
+        <p>Récupère un catway par son numéro.</p>
+        <p><strong>Paramètres :</strong> <code>id</code> - Numéro du catway</p>
+      </div>
+
+      <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3 style="color: #333; margin-bottom: 10px;">POST /catways</h3>
+        <p>Crée un nouveau catway.</p>
+        <pre style="background: #fff; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>{
+  "catwayNumber": 25,
+  "catwayType": "short",
+  "catwayState": "Neuf - Excellent état"
+}</code></pre>
+        <p><strong>catwayType :</strong> "long" ou "short"</p>
+      </div>
+
+      <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3 style="color: #333; margin-bottom: 10px;">PUT /catways/:id</h3>
+        <p>Met à jour l'état d'un catway (seul le champ <code>catwayState</code> est modifiable).</p>
+        <pre style="background: #fff; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>{
+  "catwayState": "Réparation nécessaire"
+}</code></pre>
+      </div>
+
+      <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3 style="color: #333; margin-bottom: 10px;">DELETE /catways/:id</h3>
+        <p>Supprime un catway.</p>
+      </div>
+    </section>
+
+    <!-- Section Réservations -->
+    <section style="margin-bottom: 50px;">
+      <h2 style="color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 10px;">📋 Réservations</h2>
+      
+      <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3 style="color: #333; margin-bottom: 10px;">GET /reservations</h3>
+        <p>Récupère toutes les réservations.</p>
+      </div>
+
+      <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3 style="color: #333; margin-bottom: 10px;">GET /catways/:id/reservations</h3>
+        <p>Récupère toutes les réservations d'un catway spécifique.</p>
+      </div>
+
+      <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3 style="color: #333; margin-bottom: 10px;">GET /catways/:id/reservations/:idReservation</h3>
+        <p>Récupère les détails d'une réservation spécifique.</p>
+      </div>
+
+      <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3 style="color: #333; margin-bottom: 10px;">POST /catways/:id/reservations</h3>
+        <p>Crée une nouvelle réservation pour un catway.</p>
+        <pre style="background: #fff; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>{
+  "clientName": "Marie Martin",
+  "boatName": "L'Aventurier",
+  "startDate": "2025-02-01",
+  "endDate": "2025-02-10"
+}</code></pre>
+      </div>
+
+      <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3 style="color: #333; margin-bottom: 10px;">PUT /catways/:id/reservations/:idReservation</h3>
+        <p>Met à jour une réservation existante.</p>
+      </div>
+
+      <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3 style="color: #333; margin-bottom: 10px;">DELETE /catways/:id/reservations/:idReservation</h3>
+        <p>Supprime une réservation.</p>
+      </div>
+    </section>
+
+    <!-- Section Utilisateurs -->
+    <section style="margin-bottom: 50px;">
+      <h2 style="color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 10px;">👥 Utilisateurs</h2>
+      
+      <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3 style="color: #333; margin-bottom: 10px;">GET /users</h3>
+        <p>Récupère tous les utilisateurs (sans les mots de passe).</p>
+      </div>
+
+      <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3 style="color: #333; margin-bottom: 10px;">GET /users/:email</h3>
+        <p>Récupère un utilisateur par son email.</p>
+      </div>
+
+      <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3 style="color: #333; margin-bottom: 10px;">POST /users</h3>
+        <p>Crée un nouvel utilisateur.</p>
+        <pre style="background: #fff; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>{
+  "username": "Alice Wonder",
+  "email": "alice@example.com",
+  "password": "password123"
+}</code></pre>
+      </div>
+
+      <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3 style="color: #333; margin-bottom: 10px;">PUT /users/:email</h3>
+        <p>Met à jour un utilisateur (le mot de passe est optionnel).</p>
+      </div>
+
+      <div style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3 style="color: #333; margin-bottom: 10px;">DELETE /users/:email</h3>
+        <p>Supprime un utilisateur.</p>
+      </div>
+    </section>
+
+    <!-- Codes d'erreur -->
+    <section>
+      <h2 style="color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 10px;">🚨 Codes d'erreur</h2>
+      <table style="width: 100%; margin-top: 20px;">
+        <thead>
+          <tr>
+            <th style="text-align: left; padding: 10px; background: #f8f9fa;">Code</th>
+            <th style="text-align: left; padding: 10px; background: #f8f9fa;">Signification</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding: 10px;">200</td><td style="padding: 10px;">Succès</td></tr>
+          <tr><td style="padding: 10px;">201</td><td style="padding: 10px;">Ressource créée</td></tr>
+          <tr><td style="padding: 10px;">400</td><td style="padding: 10px;">Requête invalide</td></tr>
+          <tr><td style="padding: 10px;">401</td><td style="padding: 10px;">Non autorisé</td></tr>
+          <tr><td style="padding: 10px;">404</td><td style="padding: 10px;">Ressource non trouvée</td></tr>
+          <tr><td style="padding: 10px;">409</td><td style="padding: 10px;">Conflit</td></tr>
+          <tr><td style="padding: 10px;">500</td><td style="padding: 10px;">Erreur serveur</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</div>

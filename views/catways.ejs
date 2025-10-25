@@ -1,0 +1,203 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>🚢 Gestion des Catways</h1>
+  </div>
+
+  <nav class="nav-menu">
+    <a href="/dashboard" class="nav-btn">🏠 Tableau de bord</a>
+    <a href="/reservations" class="nav-btn">📋 Réservations</a>
+    <a href="/users" class="nav-btn">👥 Utilisateurs</a>
+    <a href="/logout" class="nav-btn logout">🚪 Déconnexion</a>
+  </nav>
+
+  <div class="table-container">
+    <button class="btn-add" onclick="showAddForm()">➕ Ajouter un catway</button>
+    
+    <div id="error" class="error"></div>
+    <div id="success" class="success"></div>
+
+    <!-- Formulaire ajout/modification (caché par défaut) -->
+    <div id="catwayForm" style="display: none; margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+      <h3 id="formTitle">Ajouter un catway</h3>
+      <form id="formCatway">
+        <input type="hidden" id="catwayId">
+        
+        <div class="form-group">
+          <label for="catwayNumber">Numéro *</label>
+          <input type="number" id="catwayNumber" required min="1">
+        </div>
+        
+        <div class="form-group">
+          <label for="catwayType">Type *</label>
+          <select id="catwayType" required>
+            <option value="">-- Sélectionner --</option>
+            <option value="long">Long</option>
+            <option value="short">Short</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="catwayState">État *</label>
+          <textarea id="catwayState" rows="3" required></textarea>
+        </div>
+        
+        <button type="submit" class="btn-primary">Enregistrer</button>
+        <button type="button" class="btn-action" onclick="hideForm()" style="margin-left: 10px;">Annuler</button>
+      </form>
+    </div>
+
+    <h2>Liste des catways</h2>
+    <table id="catwaysTable">
+      <thead>
+        <tr>
+          <th>Numéro</th>
+          <th>Type</th>
+          <th>État</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="catwaysBody">
+        <tr>
+          <td colspan="4" style="text-align: center;">Chargement...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  let editMode = false;
+
+  // Charger les catways au chargement de la page
+  document.addEventListener('DOMContentLoaded', loadCatways);
+
+  async function loadCatways() {
+    try {
+      const response = await fetch('/api/catways');
+      const data = await response.json();
+      
+      const tbody = document.getElementById('catwaysBody');
+      
+      if (data.success && data.data.length > 0) {
+        tbody.innerHTML = data.data.map(catway => `
+          <tr>
+            <td><strong>#${catway.catwayNumber}</strong></td>
+            <td>${catway.catwayType}</td>
+            <td>${catway.catwayState}</td>
+            <td>
+              <button class="btn-action btn-edit" onclick="editCatway(${catway.catwayNumber})">✏️ Modifier</button>
+              <button class="btn-action btn-delete" onclick="deleteCatway(${catway.catwayNumber})">🗑️ Supprimer</button>
+            </td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #999;">Aucun catway trouvé</td></tr>';
+      }
+    } catch (error) {
+      showError('Erreur lors du chargement des catways');
+    }
+  }
+
+  function showAddForm() {
+    editMode = false;
+    document.getElementById('formTitle').textContent = 'Ajouter un catway';
+    document.getElementById('formCatway').reset();
+    document.getElementById('catwayId').value = '';
+    document.getElementById('catwayNumber').disabled = false;
+    document.getElementById('catwayForm').style.display = 'block';
+  }
+
+  async function editCatway(number) {
+    try {
+      const response = await fetch(`/api/catways/${number}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        editMode = true;
+        document.getElementById('formTitle').textContent = 'Modifier le catway';
+        document.getElementById('catwayId').value = number;
+        document.getElementById('catwayNumber').value = data.data.catwayNumber;
+        document.getElementById('catwayNumber').disabled = true;
+        document.getElementById('catwayType').value = data.data.catwayType;
+        document.getElementById('catwayState').value = data.data.catwayState;
+        document.getElementById('catwayForm').style.display = 'block';
+      }
+    } catch (error) {
+      showError('Erreur lors du chargement du catway');
+    }
+  }
+
+  async function deleteCatway(number) {
+    if (!confirm(`Supprimer le catway #${number} ?`)) return;
+    
+    try {
+      const response = await fetch(`/api/catways/${number}`, {
+        method: 'DELETE'
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        showSuccess('Catway supprimé avec succès');
+        loadCatways();
+      } else {
+        showError(data.message);
+      }
+    } catch (error) {
+      showError('Erreur lors de la suppression');
+    }
+  }
+
+  document.getElementById('formCatway').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const number = document.getElementById('catwayNumber').value;
+    const formData = {
+      catwayNumber: parseInt(number),
+      catwayType: document.getElementById('catwayType').value,
+      catwayState: document.getElementById('catwayState').value
+    };
+    
+    try {
+      const url = editMode ? `/api/catways/${number}` : '/api/catways';
+      const method = editMode ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        showSuccess(editMode ? 'Catway modifié avec succès' : 'Catway créé avec succès');
+        hideForm();
+        loadCatways();
+      } else {
+        showError(data.message);
+      }
+    } catch (error) {
+      showError('Erreur lors de l\'enregistrement');
+    }
+  });
+
+  function hideForm() {
+    document.getElementById('catwayForm').style.display = 'none';
+    document.getElementById('formCatway').reset();
+  }
+
+  function showError(msg) {
+    const errorDiv = document.getElementById('error');
+    errorDiv.textContent = msg;
+    errorDiv.style.display = 'block';
+    setTimeout(() => errorDiv.style.display = 'none', 5000);
+  }
+
+  function showSuccess(msg) {
+    const successDiv = document.getElementById('success');
+    successDiv.textContent = msg;
+    successDiv.style.display = 'block';
+    setTimeout(() => successDiv.style.display = 'none', 5000);
+  }
+</script>

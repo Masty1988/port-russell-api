@@ -11,12 +11,19 @@ const connectDB = require("./config/db");
 
 // Configuration des variables d'environnement
 dotenv.config();
+const expressLayouts = require("express-ejs-layouts");
 
 // Connexion à MongoDB
 connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Layouts EJS
+app.use(expressLayouts);
+app.set("layout", "layout");
+app.set("layout extractScripts", true);
+app.set("layout extractStyles", true);
 
 // ==================== MIDDLEWARES ====================
 
@@ -59,12 +66,13 @@ app.use((req, res, next) => {
 
 // ==================== ROUTES API ====================
 
-const catwayRoutes = require("./routes/catway.routes");
-const reservationRoutes = require("./routes/reservation.routes");
-const userRoutes = require("./routes/user.routes");
+const catwayRoutes = require("./routes/catways");
+const reservationRoutes = require("./routes/reservations");
+const userRoutes = require("./routes/users");
 const authRoutes = require("./routes/auth");
 
 app.use("/api/catways", catwayRoutes);
+app.use("/api/catways", reservationRoutes); // Pour /api/catways/:id/reservations
 app.use("/api/reservations", reservationRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api", authRoutes); // Pour /api/login et /api/logout
@@ -127,6 +135,10 @@ app.get("/logout", (req, res) => {
     res.clearCookie("connect.sid");
     res.redirect("/");
   });
+});
+// Documentation API
+app.get("/api-docs", (req, res) => {
+  res.render("api-docs");
 });
 
 // ==================== GESTION D'ERREURS ====================

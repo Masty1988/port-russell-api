@@ -1,0 +1,220 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>📋 Gestion des Réservations</h1>
+  </div>
+
+  <nav class="nav-menu">
+    <a href="/dashboard" class="nav-btn">🏠 Tableau de bord</a>
+    <a href="/catways" class="nav-btn">🚢 Catways</a>
+    <a href="/users" class="nav-btn">👥 Utilisateurs</a>
+    <a href="/logout" class="nav-btn logout">🚪 Déconnexion</a>
+  </nav>
+
+  <div class="table-container">
+    <button class="btn-add" onclick="showAddForm()">➕ Ajouter une réservation</button>
+    
+    <div id="error" class="error"></div>
+    <div id="success" class="success"></div>
+
+    <!-- Formulaire ajout/modification -->
+    <div id="reservationForm" style="display: none; margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+      <h3 id="formTitle">Ajouter une réservation</h3>
+      <form id="formReservation">
+        <input type="hidden" id="reservationId">
+        
+        <div class="form-group">
+          <label for="catwayNumber">Numéro de Catway *</label>
+          <input type="number" id="catwayNumber" required min="1">
+        </div>
+        
+        <div class="form-group">
+          <label for="clientName">Nom du client *</label>
+          <input type="text" id="clientName" required minlength="2">
+        </div>
+        
+        <div class="form-group">
+          <label for="boatName">Nom du bateau *</label>
+          <input type="text" id="boatName" required minlength="2">
+        </div>
+        
+        <div class="form-group">
+          <label for="startDate">Date de début *</label>
+          <input type="date" id="startDate" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="endDate">Date de fin *</label>
+          <input type="date" id="endDate" required>
+        </div>
+        
+        <button type="submit" class="btn-primary">Enregistrer</button>
+        <button type="button" class="btn-action" onclick="hideForm()" style="margin-left: 10px;">Annuler</button>
+      </form>
+    </div>
+
+    <h2>Liste des réservations</h2>
+    <table id="reservationsTable">
+      <thead>
+        <tr>
+          <th>Catway N°</th>
+          <th>Client</th>
+          <th>Bateau</th>
+          <th>Début</th>
+          <th>Fin</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="reservationsBody">
+        <tr>
+          <td colspan="6" style="text-align: center;">Chargement...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  let editMode = false;
+
+  document.addEventListener('DOMContentLoaded', loadReservations);
+
+  async function loadReservations() {
+    try {
+      const response = await fetch('/api/reservations');
+      const data = await response.json();
+      
+      const tbody = document.getElementById('reservationsBody');
+      
+      if (data.success && data.data.length > 0) {
+        tbody.innerHTML = data.data.map(reservation => `
+          <tr>
+            <td><strong>#${reservation.catwayNumber}</strong></td>
+            <td>${reservation.clientName}</td>
+            <td>${reservation.boatName}</td>
+            <td>${new Date(reservation.startDate).toLocaleDateString('fr-FR')}</td>
+            <td>${new Date(reservation.endDate).toLocaleDateString('fr-FR')}</td>
+            <td>
+              <button class="btn-action btn-edit" onclick="editReservation('${reservation._id}', ${reservation.catwayNumber})">✏️ Modifier</button>
+              <button class="btn-action btn-delete" onclick="deleteReservation('${reservation._id}', ${reservation.catwayNumber})">🗑️ Supprimer</button>
+            </td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999;">Aucune réservation trouvée</td></tr>';
+      }
+    } catch (error) {
+      console.error('Erreur chargement:', error);
+      showError('Erreur lors du chargement des réservations');
+    }
+  }
+
+  function showAddForm() {
+    editMode = false;
+    document.getElementById('formTitle').textContent = 'Ajouter une réservation';
+    document.getElementById('formReservation').reset();
+    document.getElementById('reservationId').value = '';
+    document.getElementById('catwayNumber').disabled = false;
+    document.getElementById('reservationForm').style.display = 'block';
+  }
+
+  async function editReservation(id, catwayNumber) {
+    try {
+      const response = await fetch(`/api/catways/${catwayNumber}/reservations/${id}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        editMode = true;
+        document.getElementById('formTitle').textContent = 'Modifier la réservation';
+        document.getElementById('reservationId').value = id;
+        document.getElementById('catwayNumber').value = data.data.catwayNumber;
+        document.getElementById('catwayNumber').disabled = true;
+        document.getElementById('clientName').value = data.data.clientName;
+        document.getElementById('boatName').value = data.data.boatName;
+        document.getElementById('startDate').value = data.data.startDate.split('T')[0];
+        document.getElementById('endDate').value = data.data.endDate.split('T')[0];
+        document.getElementById('reservationForm').style.display = 'block';
+      }
+    } catch (error) {
+      showError('Erreur lors du chargement de la réservation');
+    }
+  }
+
+  async function deleteReservation(id, catwayNumber) {
+    if (!confirm('Supprimer cette réservation ?')) return;
+    
+    try {
+      const response = await fetch(`/api/catways/${catwayNumber}/reservations/${id}`, {
+        method: 'DELETE'
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        showSuccess('Réservation supprimée avec succès');
+        loadReservations();
+      } else {
+        showError(data.message);
+      }
+    } catch (error) {
+      showError('Erreur lors de la suppression');
+    }
+  }
+
+  document.getElementById('formReservation').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const catwayNumber = document.getElementById('catwayNumber').value;
+    const reservationId = document.getElementById('reservationId').value;
+    
+    const formData = {
+      clientName: document.getElementById('clientName').value,
+      boatName: document.getElementById('boatName').value,
+      startDate: document.getElementById('startDate').value,
+      endDate: document.getElementById('endDate').value
+    };
+    
+    try {
+      const url = editMode 
+        ? `/api/catways/${catwayNumber}/reservations/${reservationId}` 
+        : `/api/catways/${catwayNumber}/reservations`;
+      const method = editMode ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        showSuccess(editMode ? 'Réservation modifiée avec succès' : 'Réservation créée avec succès');
+        hideForm();
+        loadReservations();
+      } else {
+        showError(data.message);
+      }
+    } catch (error) {
+      showError('Erreur lors de l\'enregistrement');
+    }
+  });
+
+  function hideForm() {
+    document.getElementById('reservationForm').style.display = 'none';
+    document.getElementById('formReservation').reset();
+  }
+
+  function showError(msg) {
+    const errorDiv = document.getElementById('error');
+    errorDiv.textContent = msg;
+    errorDiv.style.display = 'block';
+    setTimeout(() => errorDiv.style.display = 'none', 5000);
+  }
+
+  function showSuccess(msg) {
+    const successDiv = document.getElementById('success');
+    successDiv.textContent = msg;
+    successDiv.style.display = 'block';
+    setTimeout(() => successDiv.style.display = 'none', 5000);
+  }
+</script>

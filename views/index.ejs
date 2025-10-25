@@ -1,0 +1,67 @@
+<div class="home-container">
+  <div class="home-card">
+    <div class="info-section">
+      <h1>⚓ Port Russell</h1>
+      <p>
+        Bienvenue sur l'application de gestion des catways du port de plaisance Russell.
+        Cette API privée permet à la capitainerie de gérer efficacement les réservations 
+        et l'état des appontements.
+      </p>
+      <a href="/api-docs" class="btn-doc">📖 Documentation API</a>
+    </div>
+    
+    <div class="login-section">
+      <h2>Connexion</h2>
+      <div id="error" class="error"></div>
+      
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+        
+        <button type="submit" class="btn-primary">Se connecter</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('loginForm');
+  const errorDiv = document.getElementById('error');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorDiv.style.display = 'none';
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        window.location.href = '/dashboard';
+      } else {
+        errorDiv.textContent = data.message || 'Erreur de connexion';
+        errorDiv.style.display = 'block';
+      }
+    } catch (error) {
+      errorDiv.textContent = 'Erreur de connexion au serveur';
+      errorDiv.style.display = 'block';
+    }
+  });
+</script>

@@ -1,0 +1,48 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>🎯 Tableau de bord</h1>
+    <p class="user-info">👤 <strong><%= user.username %></strong> (<%= user.email %>)</p>
+    <p class="current-date">📅 <%= currentDate %></p>
+  </div>
+
+  <nav class="nav-menu">
+    <a href="/catways" class="nav-btn">🚢 Catways</a>
+    <a href="/reservations" class="nav-btn">📋 Réservations</a>
+    <a href="/users" class="nav-btn">👥 Utilisateurs</a>
+    <a href="/api-docs" class="nav-btn">📖 Documentation API</a>
+    <a href="/logout" class="nav-btn logout">🚪 Déconnexion</a>
+  </nav>
+
+  <div class="table-container">
+    <h2>🔴 Réservations en cours</h2>
+    
+    <% if (activeReservations.length > 0) { %>
+      <table>
+        <thead>
+          <tr>
+            <th>Catway N°</th>
+            <th>Client</th>
+            <th>Bateau</th>
+            <th>Début</th>
+            <th>Fin</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% activeReservations.forEach(reservation => { %>
+            <tr>
+              <td><strong>#<%= reservation.catwayNumber %></strong></td>
+              <td><%= reservation.clientName %></td>
+              <td><%= reservation.boatName %></td>
+              <td><%= new Date(reservation.startDate).toLocaleDateString('fr-FR') %></td>
+              <td><%= new Date(reservation.endDate).toLocaleDateString('fr-FR') %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <p style="color: #999; text-align: center; padding: 30px;">
+        Aucune réservation en cours
+      </p>
+    <% } %>
+  </div>
+</div>

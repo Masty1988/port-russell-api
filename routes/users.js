@@ -1,21 +1,22 @@
 /**
- * @fileoverview Routes pour les utilisateurs
- * @module routes/user.routes
+ * @fileoverview Routes pour la gestion des utilisateurs
+ * @module routes/users
  */
 
 const express = require("express");
 const router = express.Router();
 const {
   getAllUsers,
+  getUserByEmail,
   createUser,
   updateUser,
   deleteUser,
 } = require("../controllers/userController");
-const { verifyToken } = require("../middlewares/authMiddleware");
 
-router.get("/", verifyToken, getAllUsers);
-router.post("/", verifyToken, createUser);
-router.put("/:id", verifyToken, updateUser);
-router.delete("/:id", verifyToken, deleteUser);
+router.get("/", getAllUsers);
+router.get("/:email", getUserByEmail);
+router.post("/", createUser);
+router.put("/:email", updateUser);
+router.delete("/:email", deleteUser);
 
 module.exports = router;
