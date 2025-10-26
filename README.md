@@ -82,6 +82,18 @@ npm start
 
 L'application sera accessible sur `http://localhost:3000`
 
+## 🔐 Identifiants de test
+
+Pour tester l'application déployée :
+
+- **Email** : `capitaine3@port.fr`
+- **Mot de passe** : `123456`
+
+> ⚠️ Ces identifiants sont fournis uniquement dans le cadre de l'évaluation pédagogique.
+
+```
+
+
 ## 📖 Documentation
 
 ### Documentation API
@@ -111,43 +123,45 @@ Ou consultez le fichier [API_DOCUMENTATION.md](./API_DOCUMENTATION.md)
 ## 🗂️ Structure du projet
 
 ```
+
 port-russell-api/
 ├── config/
-│   └── db.js                 # Configuration MongoDB
+│ └── db.js # Configuration MongoDB
 ├── controllers/
-│   ├── authController.js     # Logique d'authentification
-│   ├── catwayController.js   # Logique catways
-│   ├── reservationController.js
-│   └── userController.js
+│ ├── authController.js # Logique d'authentification
+│ ├── catwayController.js # Logique catways
+│ ├── reservationController.js
+│ └── userController.js
 ├── middleware/
-│   └── auth.js               # Middlewares d'authentification
+│ └── auth.js # Middlewares d'authentification
 ├── models/
-│   ├── User.js               # Schéma utilisateur
-│   ├── Catway.js             # Schéma catway
-│   └── Reservation.js        # Schéma réservation
+│ ├── User.js # Schéma utilisateur
+│ ├── Catway.js # Schéma catway
+│ └── Reservation.js # Schéma réservation
 ├── routes/
-│   ├── auth.js               # Routes authentification
-│   ├── catways.js            # Routes catways
-│   ├── reservations.js       # Routes réservations
-│   └── users.js              # Routes utilisateurs
+│ ├── auth.js # Routes authentification
+│ ├── catways.js # Routes catways
+│ ├── reservations.js # Routes réservations
+│ └── users.js # Routes utilisateurs
 ├── views/
-│   ├── layout.ejs            # Template principal
-│   ├── index.ejs             # Page d'accueil
-│   ├── dashboard.ejs         # Tableau de bord
-│   ├── catways.ejs           # Gestion catways
-│   ├── reservations.ejs      # Gestion réservations
-│   ├── users.ejs             # Gestion utilisateurs
-│   └── api-docs.ejs          # Documentation API
+│ ├── layout.ejs # Template principal
+│ ├── index.ejs # Page d'accueil
+│ ├── dashboard.ejs # Tableau de bord
+│ ├── catways.ejs # Gestion catways
+│ ├── reservations.ejs # Gestion réservations
+│ ├── users.ejs # Gestion utilisateurs
+│ └── api-docs.ejs # Documentation API
 ├── public/
-│   └── css/
-│       └── style.css         # Styles CSS
-├── .env                      # Variables d'environnement (non versionné)
+│ └── css/
+│ └── style.css # Styles CSS
+├── .env # Variables d'environnement (non versionné)
 ├── .gitignore
-├── server.js                 # Point d'entrée de l'application
+├── server.js # Point d'entrée de l'application
 ├── package.json
 ├── README.md
 └── API_DOCUMENTATION.md
-```
+
+````
 
 ## 🔐 Sécurité
 
@@ -170,7 +184,7 @@ curl -X POST http://localhost:3000/api/login \
 # Récupérer les catways (avec le token reçu)
 curl http://localhost:3000/api/catways \
   -H "Authorization: Bearer VOTRE_TOKEN"
-```
+````
 
 ## 🌐 Déploiement
 
